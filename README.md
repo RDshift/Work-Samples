@@ -1,4 +1,7 @@
 # Work-Samples
-Work samples for use and review
+Work samples and related material for free use and review under the MIT License
 
-https://WindowsLifecycle.RDshift.com
+A Windows Lifecycle reference
+  https://WindowsLifecycle.RDshift.com
+A Windows Lifecycle calendar
+  https://WindowsCalendar.RDshift.com
