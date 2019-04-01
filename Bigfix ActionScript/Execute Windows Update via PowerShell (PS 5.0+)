@@ -1,0 +1,31 @@
+https://www.bigfix.me/fixlet/details/25528
+Language: Bigfix ActionScript
+
+
+// Set Powershell
+parameter "PowerShellexe"="{value "Path" of key "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" of x64 registry}"
+// Disable script protection
+if {exist (value "EnableScripts" of it = "0") of key "HKLM\Software\Policies\Microsoft\Windows\PowerShell" of native registry}
+wait cmd /c reg delete "HKLM\Software\Policies\Microsoft\Windows\PowerShell" /v "EnableScripts" /f
+wait cmd /c reg add "HKLM\Software\Policies\Microsoft\Windows\PowerShell" /v "EnableScriptsBackup" /t REG_DWORD /d 00000001 /f
+endif
+
+// Disable execution policy in scope of current user (system)
+waithidden "{parameter "PowerShellexe"}" -Command "Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted -Force"
+
+// Install PowerShell Modules from PSGallery
+waithidden "{parameter "PowerShellexe"}" -Command "Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force"
+waithidden "{parameter "PowerShellexe"}" -Command "Install-Module -Name PSWindowsUpdate -RequiredVersion 2.0.0.4 -Force"
+waithidden "{parameter "PowerShellexe"}" -Command "Import-Module -Name PSWindowsUpdate -Force"
+
+// Check for and install Windows Updates
+waithidden "{parameter "PowerShellexe"}" -Command "Get-WindowsUpdate -Install -MicrosoftUpdate -AcceptAll -IgnoreReboot -Confirm:$false"
+
+// Restrict execution policy
+waithidden "{parameter "PowerShellexe"}" -Command "Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Restricted -Force"
+
+// Re-enable script protection
+if {exist (value "EnableScriptsbackup" of it = "1") of key "HKLM\Software\Policies\Microsoft\Windows\PowerShell" of native registry}
+wait cmd /c reg delete "HKLM\Software\Policies\Microsoft\Windows\PowerShell" /v "EnableScriptsBackup" /f
+wait cmd /c reg add "HKLM\Software\Policies\Microsoft\Windows\PowerShell" /v "EnableScripts" /t REG_DWORD /d 00000000 /f
+endif
