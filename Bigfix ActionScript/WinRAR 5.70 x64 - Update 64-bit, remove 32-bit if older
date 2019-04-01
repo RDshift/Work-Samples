@@ -1,0 +1,15 @@
+// https://www.bigfix.me/fixlet/details/26614?force=true
+
+prefetch 65c2485beed9061f5d649111c72b565e78e5133a sha1:65c2485beed9061f5d649111c72b565e78e5133a size:3142272 https://www.rarlab.com/rar/winrar-x64-570.exe sha256:5e5ae8476052b973b427fe4991aeee2bf5b05ceae5bb45ed67849d06cb031471
+move __Download\65c2485beed9061f5d649111c72b565e78e5133a __Download\winrar-x64-570.exe
+wait __Download\winrar-x64-570.exe /S
+
+// Copy over 32-bit registration key if available
+IF {exist file "C:\Program Files (x86)\WinRAR\rarreg.key" AND NOT exist file "C:\Program Files\WinRAR\rarreg.key"}
+    move "C:\Program Files\WinRAR\rarreg.key" "C:\Program Files (x86)\WinRAR\rarreg.key"
+endif
+
+// Remove 32-bit version if vulnerable
+IF {(IF (exists key "HKLM\WOW6432Node\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinRAR archiver" of native registry) THEN (value "DisplayVersion" of key "HKLM\WOW6432Node\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinRAR archiver" of native registry as string as version < "5.70.0.0") ELSE FALSE) AND (exists file "C:\Program Files (x86)\WinRAR\uninstall.exe")}
+    waithidden "C:\Program Files (x86)\WinRAR\uninstall.exe" /S
+endif
