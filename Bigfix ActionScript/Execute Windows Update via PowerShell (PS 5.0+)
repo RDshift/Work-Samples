@@ -1,7 +1,6 @@
-https://www.bigfix.me/fixlet/details/25528
-Language: Bigfix ActionScript
+// https://www.bigfix.me/fixlet/details/25528
 
-
+// Install Windows + Microsoft Updates without rebooting or notifying the user.
 // Set Powershell
 parameter "PowerShellexe"="{value "Path" of key "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" of x64 registry}"
 // Disable script protection
